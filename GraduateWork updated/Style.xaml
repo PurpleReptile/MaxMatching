@@ -13,8 +13,6 @@
         <!--  ***** Window *****  -->
         <Style x:Key="CustomWindow" TargetType="{x:Type Window}">
             <Setter Property="WindowStyle" Value="None" />
-            <Setter Property="MinWidth" Value="950" />
-            <Setter Property="MinHeight" Value="580" />
             <Setter Property="Background" Value="Transparent" />
         </Style>
 

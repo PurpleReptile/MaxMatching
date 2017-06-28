@@ -75,9 +75,9 @@ namespace GraduateWork_updated
             prghAboutProgram.Text = Convert.ToString(strInfoAboutProgram);
         }
 
-        private void btnExit_Click(object sender, RoutedEventArgs e)
+        private void btnClose_window_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void stackPanel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

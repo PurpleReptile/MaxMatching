@@ -13,7 +13,7 @@ namespace GraduateWork_updated
         public const string lblNumberMatching = "Кол-во паросочетаний";
 
         // labels algorithms 
-        public const string lblSingleFlowAlgorithm = "Однопоточный";
+        public const string lblSingleThreadAlgorithm = "Однопоточный";
         public const string lblMultiThreadAlgorithm = "Многопоточный";
 
         public const string lblFordFulkersonAlgorithm = "Форд-Фалкерсон";

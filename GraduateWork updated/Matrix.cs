@@ -2,13 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Serialization;
 using System.IO;
 using System.Xml;
 using System.Windows.Controls;
 using System.Windows;
-using Microsoft.Win32;
 using System.Xml.Linq;
 using System.Collections;
 using System.Threading;
@@ -18,7 +15,7 @@ namespace GraduateWork_updated
 {
     public class Matrix
     {
-        /*************** BEGIN initialization variables ***************/
+        /*************** BEGIN declaration of variables ***************/
         public int[,] matrix;
         public int rows { get; set; }
         public int columns { get; set; }
@@ -34,7 +31,7 @@ namespace GraduateWork_updated
         public string typeOpenFile { get; set; }
         public string pathOpenFile { get; set; }
         XmlDocument FileXML;
-        /*************** END initialization variables ***************/
+        /*************** END declaration of variables ***************/
 
 
         /*************** BEGIN initialization constructors ***************/
@@ -50,17 +47,17 @@ namespace GraduateWork_updated
                     fill_zero_matrix();
                 else
                     if (isAdjacencyMatrix)
-                        fill_random_matrix_adjacency();
+                    fill_random_matrix_adjacency();
             }
             else
                 fill_random_matrix();
         }
         public Matrix(string fileName)
         {
-            fullNameOpenFile = System.IO.Path.GetFileName(fileName);
-            nameOpenFile = System.IO.Path.GetFileNameWithoutExtension(fileName);
-            typeOpenFile = System.IO.Path.GetExtension(fileName);
-            pathOpenFile = System.IO.Path.GetDirectoryName(fileName);
+            fullNameOpenFile = Path.GetFileName(fileName);
+            nameOpenFile = Path.GetFileNameWithoutExtension(fileName);
+            typeOpenFile = Path.GetExtension(fileName);
+            pathOpenFile = Path.GetDirectoryName(fileName);
 
             if (File.Exists(fileName))
             {
@@ -150,7 +147,7 @@ namespace GraduateWork_updated
                 return true;
 
             // check matrix is bipartite
-            if (is_bipartite(0))
+            if (is_bipartite())
             {
                 // adjacency matrix values
                 original_matrix = (int[,])matrix.Clone();
@@ -182,11 +179,14 @@ namespace GraduateWork_updated
             return false;
         }
 
-        public bool is_bipartite(int vertex)
+        // check correct matrix data
+        public bool is_bipartite()
         {
             int u;
             int[] colorArray;
+            int vertex;
 
+            vertex = 0;
             colorArray = new int[columns];
             Queue queue = new Queue();
 
@@ -213,16 +213,41 @@ namespace GraduateWork_updated
 
                     else
                         if ((matrix[u, v] > 0) && (colorArray[v] == colorArray[u]))
-                            return false;
+                        return false;
                 }
             }
 
             return true;
         }
+        public bool is_empty_matrix()
+        {
+            for (int row = 0; row < rows; row++)
+            {
+                for (int column = 0; column < columns; column++)
+                {
+                    if (matrix[row, column] == 1)
+                        return false;
+                }
+            }
+
+            return true;
+        }
+        public bool is_asymmetrical()
+        {
+            for (int row = 0; row < rows / 2; row++)
+            {
+                for (int column = columns / 2; column < columns; column++)
+                {
+                    if (matrix[row, column] != matrix[column, row])
+                        return true;
+                }
+            }
+
+            return false;
+        }
 
 
         /*************** BEGIN get/set element matrix ***************/
-
         public void get_matrix_view(Grid gridMatrixContent, Main myWindow)
         {
             RowDefinition rowd;
@@ -302,7 +327,6 @@ namespace GraduateWork_updated
         {
             matrix[row, column] = value;
         }
-
         /*************** END get/set element matrix ***************/
 
         public int[,] fill_random_matrix()
@@ -352,15 +376,18 @@ namespace GraduateWork_updated
     class solveGraph
     {
         /*************** BEGIN initialization variables ***************/
-        public Matrix inputMatrix;
+
+        public Matrix class_Matrix;
+        public Errors class_Errors;
+
         public int rows, columns;
         protected int max;
 
         protected int[,] helpMatrix;
         protected Object lck = new Object();
 
-        protected List<int> maxMatchingPos;
-        protected List<List<sbyte>> ListVertices;
+        public List<int> maxMatchingPos;
+        public List<List<sbyte>> ListOfVertices;
         protected List<sbyte> allColumns;
 
         public string TypeMatrix { get; set; }
@@ -387,8 +414,8 @@ namespace GraduateWork_updated
         public ulong countOperations { get; set; }
         public string complexityAlgorithm { get; set; }
 
-        public bool matrixIsEmpty { get; set; }
-        protected int[] arrVertices;
+        //public bool matrixIsEmpty { get; set; }
+        public int[] arrVertices;
 
         /*************** END initialization variables ***************/
 
@@ -398,27 +425,27 @@ namespace GraduateWork_updated
         // constructor random and keyboard input
         public solveGraph(int rows, int columns, bool isZeroMatrix, bool isAdjacencyMatrix)
         {
-            inputMatrix = new Matrix(rows, columns, isZeroMatrix, isAdjacencyMatrix);
-            this.rows = inputMatrix.rows;
-            this.columns = inputMatrix.columns;
-            ListVertices = new List<List<sbyte>>();
+            class_Matrix = new Matrix(rows, columns, isZeroMatrix, isAdjacencyMatrix);
+            this.rows = class_Matrix.rows;
+            this.columns = class_Matrix.columns;
+            ListOfVertices = new List<List<sbyte>>();
         }
 
         // constructor read file
         public solveGraph(string fileName)
         {
-            inputMatrix = new Matrix(fileName);
-            rows = inputMatrix.rows;
-            columns = inputMatrix.columns;
-            ListVertices = new List<List<sbyte>>();
+            class_Matrix = new Matrix(fileName);
+            rows = class_Matrix.rows;
+            columns = class_Matrix.columns;
+            ListOfVertices = new List<List<sbyte>>();
         }
+
         /*************** END initialization constructors ***************/
+
 
         public void solver(int currentNumberThreads, string currTypeAlgorithm, string currAlgorithm, string currTypeMatrix)
         {
-            string msgBoxText, msgBoxCaption;
-            MessageBoxImage msgBoxImg;
-            MessageBoxButton msgBoxBtn;
+            class_Errors = new Errors();
 
             this.currAlgorithm = currAlgorithm;
             this.currTypeAlgorithm = currTypeAlgorithm;
@@ -426,32 +453,30 @@ namespace GraduateWork_updated
 
             numberThreads = currentNumberThreads;
 
-            matrixIsEmpty = false;
-
             // check if matrix zero
-            if (empty_matrix(inputMatrix.matrix) == true)
+            if (class_Matrix.is_empty_matrix())
             {
-                matrixIsEmpty = true;
+                class_Errors.matrixIsEmpty = true;
                 return;
             }
-
-            msgBoxText = "Данная матрица не является матрицей смежности";
-            msgBoxCaption = "Некорректные данные";
-            msgBoxBtn = MessageBoxButton.OK;
-            msgBoxImg = MessageBoxImage.Error;
-
 
             // check that the selected type of matrix is the adjacency matrix
             if (MyResources.lblAdjacencyMatrix == currTypeMatrix)
             {
-                if (inputMatrix.convert_adjacency_to_reduce_matrix())
+                // checking data from a file
+                if (class_Matrix.is_asymmetrical() || class_Matrix.is_bipartite() == false)
+                {
+                    class_Errors.matrixIsAsymmetrical = true;
+                    return;
+                }
+
+                // convert adjacency matrix to reduce matrix
+                if (class_Matrix.convert_adjacency_to_reduce_matrix())
                 {
                     // update new size matrix
-                    rows = inputMatrix.rows;
-                    columns = inputMatrix.columns;
+                    rows = class_Matrix.rows;
+                    columns = class_Matrix.columns;
                 }
-                else
-                    MessageBox.Show(msgBoxText, msgBoxCaption, msgBoxBtn, msgBoxImg);
             }
 
             switch (currTypeAlgorithm)
@@ -462,7 +487,7 @@ namespace GraduateWork_updated
                     counter_maxMatching();
                     break;
 
-                // if selected algorithm count matching
+                // if selected algorithm count matchings
                 case MyResources.lblNumberMatching:
                     complexityAlgorithm = "O(n!)";
                     counter_numberMatching(currentNumberThreads);
@@ -470,81 +495,15 @@ namespace GraduateWork_updated
                     break;
             }
 
-
-            #region switch (currTypelgorithm)_test
-            //switch (currTypeAlgorithm)
-            //{
-            //    // if selected algorithm find max matching
-            //    case MyResources.lblMaxMatching:
-
-            //        // algorithm Ford-Fulkerson
-            //        if (MyResources.lblFordFulkersonAlgorithm == currAlgorithm)
-            //        {
-            //            // check that the selected type of matrix is the adjacency matrix
-            //            if (MyResources.lblAdjacencyMatrix == typeMatrix)
-            //            {
-            //                if (inputMatrix.convert_adjacency_to_reduce_matrix())
-            //                {
-            //                    // update new size matrix
-            //                    rows = inputMatrix.rows;
-            //                    columns = inputMatrix.columns;
-            //                    complexityAlgorithm = "O((M+N)*(M+N))";
-            //                    find_maxMatching();
-            //                }
-            //                else
-            //                    MessageBox.Show(msgBoxText, msgBoxCaption, msgBoxBtn, msgBoxImg);
-            //            }
-            //            // check that the selected type of matrix is the reduce matrix
-            //            if (MyResources.lblReducedMatrix == typeMatrix)
-            //            {
-            //                complexityAlgorithm = "O((M+N)*(M+N))";
-            //                find_maxMatching();
-            //            }
-            //        }
-            //        break;
-
-            //    // if selected algorithm count matching
-            //    case MyResources.lblNumberMatching:
-
-            //        if ((MyResources.lblSingleFlowAlgorithm == currAlgorithm) || (MyResources.lblMultiThreadAlgorithm == currAlgorithm))
-            //        {
-            //            // check that the selected type of matrix is the adjacency matrix
-            //            if (MyResources.lblAdjacencyMatrix == typeMatrix)
-            //            {
-            //                if (inputMatrix.convert_adjacency_to_reduce_matrix())
-            //                {
-            //                    // update new size matrix
-            //                    rows = inputMatrix.rows;
-            //                    columns = inputMatrix.columns;
-
-            //                    complexityAlgorithm = "O(n!)";
-
-            //                    counter_numberMatching(currentNumberThreads);
-            //                    all_matching_finder();
-            //                }
-            //                else
-            //                    MessageBox.Show(msgBoxText, msgBoxCaption, msgBoxBtn, msgBoxImg);
-            //            }
-
-            //            // check that the selected type of matrix is the reduce matrix
-            //            if (MyResources.lblReducedMatrix == typeMatrix)
-            //            {
-            //                complexityAlgorithm = "O(n!)";
-            //                counter_numberMatching(currentNumberThreads);
-            //                all_matching_finder();
-            //            }
-            //        }
-            //        break;
-            //}
-            #endregion
         }
 
 
         /*************** BEGIN find all matching using algorithms ***************/
 
+        // main function for singleThread/multiThread algorithms
         void counter_numberMatching(int currentNumberThreads)
         {
-            List<Thread> listThreads = new List<Thread>();
+            List<Thread> listThreads;
             List<sbyte>[] allColumnsToProccess;
             List<sbyte>[] unUsedColumns;
             List<sbyte> resultPath;
@@ -552,8 +511,10 @@ namespace GraduateWork_updated
             bool flag;
             sbyte j;
 
-            helpMatrix = (int[,])inputMatrix.matrix.Clone();
+            // initialization variables
+            helpMatrix = (int[,])class_Matrix.matrix.Clone();
             resultPath = new List<sbyte>();
+            listThreads = new List<Thread>();
 
             if (columns < currentNumberThreads)
                 currentNumberThreads = columns;
@@ -587,7 +548,7 @@ namespace GraduateWork_updated
             System.Diagnostics.Stopwatch stopWatch = new System.Diagnostics.Stopwatch();
             countOperations = 0;
 
-            ListVertices.Clear();
+            ListOfVertices.Clear();
             stopWatch.Start();      // start timer
 
             for (sbyte ind = 0; ind < currentNumberThreads; ind++)
@@ -627,14 +588,14 @@ namespace GraduateWork_updated
             countMaxMatching = 0;
             max = 0;
 
-            sizeList = ListVertices.Count;
+            sizeList = ListOfVertices.Count;
 
             helpArray = new sbyte[sizeList];
             maxMatchingPos = new List<int>();
 
             for (row = 0; row < sizeList; row++)
             {
-                helpArray[row] = count_one_in_list(ListVertices[row]);
+                helpArray[row] = count_one_in_list(ListOfVertices[row]);
                 if (helpArray[row] > max)
                     max = helpArray[row];
             }
@@ -687,7 +648,7 @@ namespace GraduateWork_updated
 
                     lock (lck)
                     {
-                        ListVertices.Add(new List<sbyte>(resultPath));
+                        ListOfVertices.Add(new List<sbyte>(resultPath));
                         resultPath.RemoveAt(row);
                     }
                     return;
@@ -730,27 +691,16 @@ namespace GraduateWork_updated
             for (uint row = 0; row < rows; row++)
             {
                 for (uint column = 0; column < columns; column++)
-                    helpMatrix[row, column] = inputMatrix.matrix[row, column];
+                    helpMatrix[row, column] = class_Matrix.matrix[row, column];
             }
         }
-        bool empty_matrix(int[,] matrix)
-        {
-            for (int row = 0; row < rows; row++)
-            {
-                for (int column = 0; column < columns; column++)
-                {
-                    if (matrix[row, column] == 1)
-                        return false;
-                }
-            }
 
-            return true;
-        }
         /*************** END find all matching using algorithms ***************/
 
 
         /*************** BEGIN find maximum matching using algorithms ***************/
 
+        // main function for algorithm Ford-Fulkerson
         void counter_maxMatching()
         {
             int[] arrMarker;
@@ -758,7 +708,7 @@ namespace GraduateWork_updated
 
             arrMarker = new int[columns];
             arrVertices = new int[rows];
-            helpMatrix = (int[,])inputMatrix.matrix.Clone();
+            helpMatrix = (int[,])class_Matrix.matrix.Clone();
             stopWatch = new System.Diagnostics.Stopwatch();
 
             stopWatch.Start();
@@ -772,6 +722,8 @@ namespace GraduateWork_updated
 
             strTimeAlg = string.Format("{0:N6} с", stopWatch.Elapsed.TotalSeconds);
         }
+
+        // realization depth-first search for Ford-Fulkerson 
         bool DFS(int[] arrMarker, bool[] arrVisited, int[] arrVertices, int[,] matrix, int row)
         {
             for (int column = 0; column < columns; column++)
@@ -792,6 +744,8 @@ namespace GraduateWork_updated
             }
             return false;
         }
+
+        // realization algorithm Ford-Fulkerson
         void alg_Ford_Fulkerson(int[,] matrix, int[] arrMarker, int[] arrVertices)
         {
             for (int i = 0; i < columns; i++)
@@ -830,7 +784,7 @@ namespace GraduateWork_updated
 
             filling_content_for_result(saveFileName);
 
-            switch (inputMatrix.typeOpenFile)
+            switch (class_Matrix.typeOpenFile)
             {
                 /***** save file to format XML */
                 case ".xml":
@@ -854,10 +808,10 @@ namespace GraduateWork_updated
 
         void filling_content_for_result(string saveFileName)
         {
-            inputMatrix.typeOpenFile = System.IO.Path.GetExtension(saveFileName);
+            class_Matrix.typeOpenFile = System.IO.Path.GetExtension(saveFileName);
 
             // filling content xml format
-            if (".xml" == inputMatrix.typeOpenFile)
+            if (".xml" == class_Matrix.typeOpenFile)
             {
                 strCurrentAlgorithm = "алгоритм";
                 strNumberThreads = "кол-во_потоков";
@@ -870,9 +824,9 @@ namespace GraduateWork_updated
             }
 
             // filling content txt format
-            if (".txt" == inputMatrix.typeOpenFile)
+            if (".txt" == class_Matrix.typeOpenFile)
             {
-                strCurrentAlgorithm = "Алгоритм:\t\t\t";
+                strCurrentAlgorithm = "Алгоритм:\t\t";
                 strNumberThreads = "Кол-во потоков:\t\t";
                 strComplexityAlgorithm = "Оценка сложности:\t";
                 strCountOperations = "Кол-во операций:\t";
@@ -885,6 +839,7 @@ namespace GraduateWork_updated
 
         /*************** BEGIN save result to file format XML ***************/
 
+        // save result XML
         void save_result_to_xml_format(string typeMatch, string saveFileName)
         {
             if (currAlgorithm == MyResources.lblFordFulkersonAlgorithm)
@@ -906,19 +861,18 @@ namespace GraduateWork_updated
 
 
             if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                drawing_adjacency_matrix(doc);
+                drawing_an_adjacency_matrix(doc);
 
-            drawing_reduce_matrix(doc);
-
+            drawing_a_reduce_matrix(doc);
 
             switch (currTypeAlgorithm)
             {
-                case MyResources.lblMaxMatching:
-                    drawing_match_edges(doc, typeMatch);
+                case MyResources.lblNumberMatching:
+                    drawing_all_matching_XML(doc, typeMatch);
                     break;
 
-                case MyResources.lblNumberMatching:
-                    drawing_matching_edges(doc, typeMatch);
+                case MyResources.lblMaxMatching:
+                    drawing_matchings_XML(doc, typeMatch);
                     break;
             }
 
@@ -926,18 +880,18 @@ namespace GraduateWork_updated
         }
 
         // drawing new adjacency matrix for file format XML
-        void drawing_adjacency_matrix(XDocument doc)
+        void drawing_an_adjacency_matrix(XDocument doc)
         {
             // add element matrix
             var elemMatrix = new XElement("матрица", new XAttribute("тип", MyResources.lblAdjacencyMatrix));
 
-            for (int row = 0; row < inputMatrix.original_rows; row++)
+            for (int row = 0; row < class_Matrix.original_rows; row++)
             {
                 var elemRow = new XElement("строка");
 
-                for (int column = 0; column < inputMatrix.original_columns; column++)
+                for (int column = 0; column < class_Matrix.original_columns; column++)
                 {
-                    var elemCol = new XElement("столбец", inputMatrix.original_matrix[row, column]);
+                    var elemCol = new XElement("столбец", class_Matrix.original_matrix[row, column]);
                     elemRow.Add(elemCol);
                 }
                 elemMatrix.Add(elemRow);
@@ -948,7 +902,7 @@ namespace GraduateWork_updated
         }
 
         // drawing new reduce matrix for file format XML
-        void drawing_reduce_matrix(XDocument doc)
+        void drawing_a_reduce_matrix(XDocument doc)
         {
             // add element matrix
             var elemMatrix = new XElement("матрица", new XAttribute("тип", MyResources.lblReducedMatrix));
@@ -959,7 +913,7 @@ namespace GraduateWork_updated
 
                 for (int column = 0; column < columns; column++)
                 {
-                    var elemCol = new XElement("столбец", inputMatrix.matrix[row, column]);
+                    var elemCol = new XElement("столбец", class_Matrix.matrix[row, column]);
                     elemRow.Add(elemCol);
                 }
 
@@ -971,7 +925,7 @@ namespace GraduateWork_updated
         }
 
         // drawing all matching edges for file format XML
-        void drawing_matching_edges(XDocument doc, string typeMatch)
+        void drawing_all_matching_XML(XDocument doc, string typeMatch)
         {
             var matching_edges = new XElement("рёбра_паросочетаний"); ;
             int numberColumn;
@@ -989,11 +943,11 @@ namespace GraduateWork_updated
                 for (int column = 0; column < columns; column++)
                 {
                     if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                        numberColumn = (ListVertices[maxMatchingPos[row]][column] + inputMatrix.original_columns / 2);
+                        numberColumn = (ListOfVertices[maxMatchingPos[row]][column] + class_Matrix.original_columns / 2);
                     else
-                        numberColumn = ListVertices[maxMatchingPos[row]][column];
+                        numberColumn = ListOfVertices[maxMatchingPos[row]][column];
 
-                    if (ListVertices[maxMatchingPos[row]][column] != -1)
+                    if (ListOfVertices[maxMatchingPos[row]][column] != -1)
                     {
                         var edge = new XElement("ребро", numberColumn,
                             new XAttribute("строка", column));
@@ -1005,8 +959,8 @@ namespace GraduateWork_updated
             doc.Element("Результат").Add(matching_edges);
         }
 
-        // drawing match edges for file format XML
-        void drawing_match_edges(XDocument doc, string typeMatch)
+        // drawing a match edges for file format XML
+        void drawing_matchings_XML(XDocument doc, string typeMatch)
         {
             int numberColumn;
 
@@ -1022,7 +976,7 @@ namespace GraduateWork_updated
             for (int column = 0; column < countMaxMatching; column++)
             {
                 if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                    numberColumn = (arrVertices[column] + inputMatrix.original_columns / 2);
+                    numberColumn = (arrVertices[column] + class_Matrix.original_columns / 2);
                 else
                     numberColumn = arrVertices[column];
 
@@ -1039,6 +993,7 @@ namespace GraduateWork_updated
 
         /*************** BEGIN save result to file format TXT ***************/
 
+        // save result TXT
         void save_result_to_txt_format(string typeMatch, string saveFileName)
         {
             using (StreamWriter writer = File.CreateText(saveFileName))
@@ -1065,19 +1020,19 @@ namespace GraduateWork_updated
                 switch (currTypeMatrix)
                 {
                     case MyResources.lblAdjacencyMatrix:
-                        writer.WriteLine("Столбцов:\t\t\t" + inputMatrix.original_columns);
-                        writer.WriteLine("Строк:\t\t\t\t" + inputMatrix.original_rows);
+                        writer.WriteLine("Столбцов:\t\t" + class_Matrix.original_columns);
+                        writer.WriteLine("Строк:\t\t\t" + class_Matrix.original_rows);
                         writer.WriteLine();
 
                         writer.WriteLine("***** Исходная матрица *****");
-                        drawing_a_adjacency_matrix(writer, strMatrixToFile);
+                        drawing_an_adjacency_matrix(writer, strMatrixToFile);
                         writer.WriteLine("***** Приведённая матрица смежности *****");
                         drawing_a_reduce_matrix(writer, strMatrixToFile);
                         break;
 
                     case MyResources.lblReducedMatrix:
-                        writer.WriteLine("Столбцов:\t\t\t" + columns);
-                        writer.WriteLine("Строк:\t\t\t\t" + rows);
+                        writer.WriteLine("Столбцов:\t\t" + columns);
+                        writer.WriteLine("Строк:\t\t\t" + rows);
                         writer.WriteLine();
 
                         writer.WriteLine("***** Матрица *****");
@@ -1091,11 +1046,11 @@ namespace GraduateWork_updated
                 switch (currTypeAlgorithm)
                 {
                     case MyResources.lblMaxMatching:
-                        drawing_a_match_edges(writer);
+                        drawing_matchings_TXT(writer);
                         break;
 
                     case MyResources.lblNumberMatching:
-                        drawing_a_matching_edges(writer);
+                        drawing_all_matching_TXT(writer);
                         break;
                 }
 
@@ -1104,17 +1059,17 @@ namespace GraduateWork_updated
         }
 
         // drawing new adjacency matrix for file format TXT
-        void drawing_a_adjacency_matrix(StreamWriter writer, string strMatrixToFile)
+        void drawing_an_adjacency_matrix(StreamWriter writer, string strMatrixToFile)
         {
             writer.WriteLine();
 
-            for (int row = 0; row < inputMatrix.original_rows; row++)
+            for (int row = 0; row < class_Matrix.original_rows; row++)
             {
                 strMatrixToFile = "";
 
-                for (int column = 0; column < inputMatrix.original_columns; column++)
+                for (int column = 0; column < class_Matrix.original_columns; column++)
                 {
-                    strMatrixToFile += inputMatrix.original_matrix[row, column] + "\t";
+                    strMatrixToFile += class_Matrix.original_matrix[row, column] + "\t";
                 }
                 writer.WriteLine(strMatrixToFile);
             }
@@ -1133,7 +1088,7 @@ namespace GraduateWork_updated
 
                 for (int column = 0; column < columns; column++)
                 {
-                    strMatrixToFile += inputMatrix.matrix[row, column] + "\t";
+                    strMatrixToFile += class_Matrix.matrix[row, column] + "\t";
                 }
                 writer.WriteLine(strMatrixToFile);
             }
@@ -1142,7 +1097,7 @@ namespace GraduateWork_updated
         }
 
         // drawing all matching edges for file format TXT
-        void drawing_a_matching_edges(StreamWriter writer)
+        void drawing_all_matching_TXT(StreamWriter writer)
         {
             int numberColumn = 0;
             string typeMatch = "";
@@ -1160,18 +1115,18 @@ namespace GraduateWork_updated
                 for (int column = 0; column < columns; column++)
                 {
                     if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                        numberColumn = (ListVertices[maxMatchingPos[row]][column] + inputMatrix.original_columns / 2);
+                        numberColumn = (ListOfVertices[maxMatchingPos[row]][column] + class_Matrix.original_columns / 2);
                     else
-                        numberColumn = ListVertices[maxMatchingPos[row]][column];
+                        numberColumn = ListOfVertices[maxMatchingPos[row]][column];
 
-                    if (ListVertices[maxMatchingPos[row]][column] != -1)
+                    if (ListOfVertices[maxMatchingPos[row]][column] != -1)
                         writer.WriteLine("строка " + column + " -> ребро " + numberColumn);
                 }
             }
         }
 
-        // drawing match edges for file format TXT
-        void drawing_a_match_edges(StreamWriter writer)
+        // drawing a match edges for file format TXT
+        void drawing_matchings_TXT(StreamWriter writer)
         {
             int numberColumn = 0;
             string typeMatch = "";
@@ -1187,7 +1142,7 @@ namespace GraduateWork_updated
             for (int column = 0; column < countMaxMatching; column++)
             {
                 if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                    numberColumn = (arrVertices[column] + inputMatrix.original_columns / 2);
+                    numberColumn = (arrVertices[column] + class_Matrix.original_columns / 2);
                 else
                     numberColumn = arrVertices[column];
 
@@ -1200,6 +1155,7 @@ namespace GraduateWork_updated
 
         /*************** BEGIN save result to file format HTML ***************/
 
+        // save result HTML 
         void save_result_to_html_format(string saveFileName)
         {
             int[,] matrix;
@@ -1243,22 +1199,22 @@ namespace GraduateWork_updated
                     switch (currTypeMatrix)
                     {
                         case MyResources.lblAdjacencyMatrix:
-                            matrix = new int[inputMatrix.original_rows, inputMatrix.original_columns];
-                            matrix = (int[,])inputMatrix.original_matrix.Clone();
+                            matrix = new int[class_Matrix.original_rows, class_Matrix.original_columns];
+                            matrix = (int[,])class_Matrix.original_matrix.Clone();
 
                             writer.WriteLine("<h3><a name=\"original-matrix\">Исходная матрица</a></h3>");
-                            drawing_a_adjacency_matrix(writer, matrix);
+                            drawing_an_adjacency_matrix(writer, matrix);
 
-                            matrix = new int[inputMatrix.rows, inputMatrix.columns];
-                            matrix = (int[,])inputMatrix.matrix.Clone();
+                            matrix = new int[class_Matrix.rows, class_Matrix.columns];
+                            matrix = (int[,])class_Matrix.matrix.Clone();
 
                             writer.WriteLine("<h3><a name=\"reduce-matrix\">Приведённая матрица</a></h3>");
                             drawing_a_reduce_matrix(writer, matrix, true);
                             break;
 
                         case MyResources.lblReducedMatrix:
-                            matrix = new int[inputMatrix.rows, inputMatrix.columns];
-                            matrix = (int[,])inputMatrix.matrix.Clone();
+                            matrix = new int[class_Matrix.rows, class_Matrix.columns];
+                            matrix = (int[,])class_Matrix.matrix.Clone();
 
                             writer.WriteLine("<h3><a name=\"reduce-matrix\">Матрица</a></h3>");
                             drawing_a_reduce_matrix(writer, matrix, false);
@@ -1270,10 +1226,10 @@ namespace GraduateWork_updated
                     {
                         // Ford-Fulkerson
                         if (currAlgorithm == MyResources.lblFordFulkersonAlgorithm)
-                            drawing_match_edges(writer);
+                            drawing_matchings_HTML(writer);
                         else
                             if (currTypeAlgorithm == MyResources.lblNumberMatching)
-                                drawing_matching_edges(writer);
+                            drawing_all_matchings_HTML(writer);
                     }
                     // ***************** END drawing a matrix ***************** //
 
@@ -1283,16 +1239,17 @@ namespace GraduateWork_updated
             }
         }
 
+        // drawing original matrix for file format HTML
         void drawing_a_matrix(StreamWriter writer, int[,] matrix, int columns, int rows, bool adjacencyToReduce)
         {
             writer.WriteLine("<table class=\"table tbl-matrix\">");
             writer.WriteLine("<tr class=\"bold-td\">");
             writer.WriteLine("<td style=\"font-weight: normal;\">-</td>");
 
-            // draw a count rows
+            // drawing a count rows
             if (adjacencyToReduce)
             {
-                for (int col = inputMatrix.original_columns / 2; col < inputMatrix.original_columns; col++)
+                for (int col = class_Matrix.original_columns / 2; col < class_Matrix.original_columns; col++)
                     writer.WriteLine("<td>" + col + "</td>");
             }
 
@@ -1324,20 +1281,20 @@ namespace GraduateWork_updated
         }
 
         // drawing new adjacency matrix for file format HTML
-        void drawing_a_adjacency_matrix(StreamWriter writer, int[,] matrix)
+        void drawing_an_adjacency_matrix(StreamWriter writer, int[,] matrix)
         {
             writer.WriteLine("<div class=\"flex-container\">");
             writer.WriteLine("<div class=\"flex-item flex-item-matrix\">");
-            drawing_a_matrix(writer, matrix, inputMatrix.original_columns, inputMatrix.original_rows, false);
+            drawing_a_matrix(writer, matrix, class_Matrix.original_columns, class_Matrix.original_rows, false);
             writer.WriteLine("</div>");
             writer.WriteLine("<div class=\"flex-item flex-item-matrix\">");
             writer.WriteLine("<table class=\"table tbl-result tbl-matrix-origin\">");
             writer.WriteLine("<tr><th>Параметр</th><th>Значение</th></tr><tr><td>Тип матрицы</td>");
             writer.WriteLine("<td>" + MyResources.lblAdjacencyMatrix + "</td>");
             writer.WriteLine("</tr><tr><td>Кол-во столбцов</td>");
-            writer.WriteLine("<td>" + inputMatrix.original_columns + "</td>");
+            writer.WriteLine("<td>" + class_Matrix.original_columns + "</td>");
             writer.WriteLine("</tr><tr><td>Кол-во строк</td>");
-            writer.WriteLine("<td>" + inputMatrix.original_rows + "</td>");
+            writer.WriteLine("<td>" + class_Matrix.original_rows + "</td>");
             writer.WriteLine("</tr></table></div></div>");
         }
 
@@ -1347,7 +1304,7 @@ namespace GraduateWork_updated
             writer.WriteLine("<div class=\"flex-container\">");
             writer.WriteLine("<div class=\"flex-item flex-item-matrix\">");
 
-            drawing_a_matrix(writer, matrix, inputMatrix.columns, inputMatrix.rows, adjacencyToReduce);
+            drawing_a_matrix(writer, matrix, class_Matrix.columns, class_Matrix.rows, adjacencyToReduce);
             writer.WriteLine("</div>");
             writer.WriteLine("<div class=\"flex-item flex-item-matrix\">");
             writer.WriteLine("<table class=\"table tbl-result tbl-matrix-origin\">");
@@ -1355,14 +1312,14 @@ namespace GraduateWork_updated
             writer.WriteLine("<td>Тип матрицы</td>");
             writer.WriteLine("<td>" + MyResources.lblReducedMatrix + "</td>");
             writer.WriteLine("</tr><tr><td>Кол-во столбцов</td>");
-            writer.WriteLine("<td>" + inputMatrix.columns + "</td>");
+            writer.WriteLine("<td>" + class_Matrix.columns + "</td>");
             writer.WriteLine("</tr><tr><td>Кол-во строк</td>");
-            writer.WriteLine("<td>" + inputMatrix.rows + "</td>");
+            writer.WriteLine("<td>" + class_Matrix.rows + "</td>");
             writer.WriteLine("</tr></table></div></div>");
         }
 
         // drawing all matching edges for file format HTML
-        void drawing_matching_edges(StreamWriter writer)
+        void drawing_all_matchings_HTML(StreamWriter writer)
         {
             int numberInCycle;
             int cx, cy;             // SVG circle coordinates
@@ -1390,17 +1347,19 @@ namespace GraduateWork_updated
 
                 // drawing a lines
                 for (int column = 0; column < columns; column++)
-                    if (ListVertices[maxMatchingPos[row]][column] != -1)
+                {
+                    if (ListOfVertices[maxMatchingPos[row]][column] != -1)
                     {
                         y2 = 21;
-                        y2 += (ListVertices[maxMatchingPos[row]][column] * 60);
+                        y2 += (ListOfVertices[maxMatchingPos[row]][column] * 60);
 
                         writer.WriteLine("<line x1=\"" + x1 + "\" y1=\"" + cy + "\" x2=\"" + x2 + "\" y2=\"" + y2 + "\" class=\"line-svg\" />");
 
                         // update variables for next SVG draw
-                        cy += 60;
                         y += 60;
                     }
+                    cy += 60;
+                }
 
                 cx = 21;
                 cy = 21;
@@ -1414,7 +1373,7 @@ namespace GraduateWork_updated
                 for (int column = 0; column < columns; column++)
                 {
                     if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                        numberInCycle = (column + inputMatrix.original_columns / 2);
+                        numberInCycle = (column + class_Matrix.original_columns / 2);
                     else
                         numberInCycle = column;
 
@@ -1434,15 +1393,15 @@ namespace GraduateWork_updated
             }
         }
 
-        // drawing match edges for file format HTML
-        void drawing_match_edges(StreamWriter writer)
+        // drawing a match edges for file format HTML
+        void drawing_matchings_HTML(StreamWriter writer)
         {
-            int numberInCycle;
+            int numberInCircle;
             int cx, cy;             // SVG circle coordinates
             int x, y;               // SVG text coordinates
             int x1, x2, y2;         // SVG line coordinates
 
-            numberInCycle = 0;
+            numberInCircle = 0;
 
             writer.WriteLine("<h3><a name=\"matching\">Паросочетания</a></h3>");
             writer.WriteLine("<div class=\"matching\">");
@@ -1484,15 +1443,15 @@ namespace GraduateWork_updated
             for (int column = 0; column < columns; column++)
             {
                 if (currTypeMatrix == MyResources.lblAdjacencyMatrix)
-                    numberInCycle = (column + inputMatrix.original_columns / 2);
+                    numberInCircle = (column + class_Matrix.original_columns / 2);
                 else
-                    numberInCycle = column;
+                    numberInCircle = column;
 
                 writer.WriteLine("<circle cx=\"" + cx + "\" cy=\"" + cy + "\" r=\"20\" class=\"circle-svg\" />");
                 writer.WriteLine("<text x=\"" + x + "\" y=\"" + y + "\" fill=\"black\">" + column + "</text>");
 
                 writer.WriteLine("<circle cx=\"" + (cx + 110) + "\" cy=\"" + cy + "\" r=\"20\" class=\"circle-svg\" />");
-                writer.WriteLine("<text x=\"" + (x + 110) + "\" y=\"" + y + "\" fill=\"black\">" + numberInCycle + "</text>");
+                writer.WriteLine("<text x=\"" + (x + 110) + "\" y=\"" + y + "\" fill=\"black\">" + numberInCircle + "</text>");
 
                 // update variables for next SVG drawing
                 cy += 60;
@@ -1506,8 +1465,6 @@ namespace GraduateWork_updated
         /*************** END save result to file format HTML ***************/
 
         /*************** END save result to file ***************/
-
-
 
 
         //void counter_maxMatching(int[,] matrix)
@@ -2454,3 +2411,11 @@ namespace GraduateWork_updated
 
 //    strTimeAlg = string.Format("{0:N6}", stopWatch.Elapsed.TotalSeconds) + " с";
 //} */
+
+
+
+
+
+
+
+

@@ -1,19 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.IO;
-using System.Xml;
 using Microsoft.Win32;
 
 namespace GraduateWork_updated
@@ -99,14 +89,17 @@ namespace GraduateWork_updated
                 {
                     fill_information_about_file();
 
-                    cmbBoxTypeAlgorithms.Items.Clear();     // clear old information in combobox
-                    cmbBoxTypeAlgorithms.IsEnabled = true;
-                    fill_cmbBox_typeAlgorithms();           // filling combobox new information
+                    cmbBoxTypeAlgorithms.Items.Clear();         // clear old information in combobox
+                    
+                    if (cmbBoxTypeAlgorithms.IsEnabled == true)
+                        fill_cmbBox_typeAlgorithms();           // filling combobox new information
+                    else
+                        cmbBoxTypeAlgorithms.IsEnabled = true;
 
-                    isEnable_buttons(false, true, true);
+                    isEnable_buttons(false, true, true, false);
                     gridMatrixContent.IsEnabled = false;
 
-                    txtBlck_matrixNotLoaded.Visibility = System.Windows.Visibility.Hidden;
+                    txtBlck_matrixNotLoaded.Visibility = Visibility.Hidden;
                 }
             }
 
@@ -160,7 +153,7 @@ namespace GraduateWork_updated
                             }
 
                         default_field_results();
-                        isEnable_buttons(false, true, false);
+                        isEnable_buttons(false, true, false, false);
                     }
                     break;
 
@@ -180,7 +173,7 @@ namespace GraduateWork_updated
                         }
 
 
-                    isEnable_buttons(false, true, false);
+                    isEnable_buttons(false, true, false, false);
                     break;
             }
         }
@@ -204,6 +197,7 @@ namespace GraduateWork_updated
                 {
                     save_result(true);
                     default_field_results();
+                    btnResultOfRendering.IsEnabled = false;
                     btnSaveInFile.IsEnabled = false;
                 }
             }
@@ -227,27 +221,18 @@ namespace GraduateWork_updated
         {
             string currAlg, currTypeMatrix, currTypeAlg;
             int currentNumberThreads;
-
-            // variables for message box 
-            string msgBoxMessage, msgBoxCaption;
-            MessageBoxButton msgBoxBtn;
-            MessageBoxImage msgBoxIcon;
-
+            
             // initialization variables
             currAlg = "";
             currTypeMatrix = "";
             currTypeAlg = "";
             currentNumberThreads = 1;
 
-            msgBoxMessage = "Извините, но исходная матрица оказалась пустой!";
-            msgBoxCaption = "Пустая матрица";
-            msgBoxBtn = MessageBoxButton.OK;
-            msgBoxIcon = MessageBoxImage.Information;
-
             try
             {
                 Mouse.OverrideCursor = Cursors.Wait;
 
+                // get value data about algorithm
                 if (cmbBoxTypeAlgorithms.HasItems)
                     currTypeAlg = Convert.ToString(cmbBoxTypeAlgorithms.SelectedItem);
 
@@ -263,13 +248,11 @@ namespace GraduateWork_updated
                 switch (btnReadFile.IsEnabled)
                 {
                     case true:
-
                         if (txtBoxTypeMatrix.Text != null)
                             currTypeMatrix = txtBoxTypeMatrix.Text.ToString();
                         break;
 
                     case false:
-
                         if (true == cmbBoxTypeMatrix.IsEnabled && cmbBoxTypeMatrix.HasItems)
                             currTypeMatrix = cmbBoxTypeMatrix.SelectedValue.ToString();
                         break;
@@ -277,16 +260,25 @@ namespace GraduateWork_updated
 
                 class_Graph.solver(currentNumberThreads, currTypeAlg, currAlg, currTypeMatrix);
 
-                // output result 
-                if (class_Graph.matrixIsEmpty == true)
+                // error checking 
+                if (class_Graph.class_Errors.is_error())
                 {
-                    MessageBox.Show(msgBoxMessage, msgBoxCaption, msgBoxBtn, msgBoxIcon);
-                    return;
+                    // matrix is empty
+                    if (class_Graph.class_Errors.matrixIsEmpty)
+                        class_Graph.class_Errors.message_matrix_is_empty();
+
+                    // matrix is asymmetrical
+                    if (class_Graph.class_Errors.matrixIsAsymmetrical)
+                        class_Graph.class_Errors.message_matrix_is_asymmetrical();
+
+                    return; // exit from method
                 }
+
                 else
                 {
                     fill_result_to_textbox(currAlg);
                     btnSaveInFile.IsEnabled = true;
+                    btnResultOfRendering.IsEnabled = true;
 
                     if ("random" == typeInput || "keyboard" == typeInput)
                         btnReset.IsEnabled = true;
@@ -656,7 +648,7 @@ namespace GraduateWork_updated
             default_values();
 
             visible_buttons(false, false, true);
-            isEnable_buttons(false, false, false);
+            isEnable_buttons(false, false, false, false);
 
             visible_panel_data_matrix(true, false);
 
@@ -683,7 +675,7 @@ namespace GraduateWork_updated
             maxValue = 0;
 
             typeInput = "random";
-            isEnable_buttons(false, true, false);
+            isEnable_buttons(false, true, false, false);
             visible_panel_data_matrix(false, true);
 
             cmbBoxTypeMatrix.Items.Clear();
@@ -716,7 +708,7 @@ namespace GraduateWork_updated
             maxValue = 0;
 
             typeInput = "keyboard";
-            isEnable_buttons(false, true, false);
+            isEnable_buttons(false, true, false, false);
             visible_panel_data_matrix(false, true);
 
             gridMatrixContent.IsEnabled = true;
@@ -787,7 +779,7 @@ namespace GraduateWork_updated
 
             btnReadFile.Content = strReadFile;
 
-            isEnable_buttons(false, false, false);
+            isEnable_buttons(false, false, false, false);
         }
         void default_field_results()
         {
@@ -866,8 +858,8 @@ namespace GraduateWork_updated
 
                     case "file":
                         class_Graph.currTypeMatrix = txtBoxTypeMatrix.Text;
-                        fullNameOpenFile = class_Graph.inputMatrix.fullNameOpenFile;
-                        pathOpenFile = class_Graph.inputMatrix.pathOpenFile;
+                        fullNameOpenFile = class_Graph.class_Matrix.fullNameOpenFile;
+                        pathOpenFile = class_Graph.class_Matrix.pathOpenFile;
                         break;
                 }
 
@@ -1014,16 +1006,17 @@ namespace GraduateWork_updated
             rows = int.Parse(txtBoxNumRows.Text);
             columns = int.Parse(txtBoxNumColumns.Text);
             class_Graph = new solveGraph(rows, columns, isZeroMatrix, isAdjacencyMatrix);
-            class_Graph.inputMatrix.get_matrix_view(gridMatrixContent, this);
+            class_Graph.class_Matrix.get_matrix_view(gridMatrixContent, this);
 
             //txtBoxMatrixContent.Text = class_Graph.inputMatrix.matrix_to_string();
         }
 
-        void isEnable_buttons(bool valSaveInFile, bool valCompute, bool valReset)
+        void isEnable_buttons(bool valSaveInFile, bool valCompute, bool valReset, bool valRenderingResult)
         {
             btnSaveInFile.IsEnabled = valSaveInFile;
             btnCompute.IsEnabled = valCompute;
             btnReset.IsEnabled = valReset;
+            btnResultOfRendering.IsEnabled = valRenderingResult;
         }
 
         bool read_matrix_from_file()
@@ -1057,21 +1050,21 @@ namespace GraduateWork_updated
             btnReadFile.Content = changeReadBtn;
 
             // information about input file
-            txtBoxFileName.Text = class_Graph.inputMatrix.nameOpenFile;
-            txtBoxTypeFile.Text = class_Graph.inputMatrix.typeOpenFile;
-            txtBoxPathFile.Text = class_Graph.inputMatrix.pathOpenFile;
+            txtBoxFileName.Text = class_Graph.class_Matrix.nameOpenFile;
+            txtBoxTypeFile.Text = class_Graph.class_Matrix.typeOpenFile;
+            txtBoxPathFile.Text = class_Graph.class_Matrix.pathOpenFile;
 
             // tool tip for information about input file
-            txtBoxFileName.ToolTip = class_Graph.inputMatrix.nameOpenFile;
-            txtBoxTypeFile.ToolTip = class_Graph.inputMatrix.typeOpenFile;
-            txtBoxPathFile.ToolTip = class_Graph.inputMatrix.pathOpenFile;
+            txtBoxFileName.ToolTip = class_Graph.class_Matrix.nameOpenFile;
+            txtBoxTypeFile.ToolTip = class_Graph.class_Matrix.typeOpenFile;
+            txtBoxPathFile.ToolTip = class_Graph.class_Matrix.pathOpenFile;
 
             // information about input matrix
-            txtBoxTypeMatrix.Text = class_Graph.inputMatrix.typeMatrix;
-            txtBoxNumColumns_file.Text = class_Graph.inputMatrix.columns.ToString();
-            txtBoxNumRows_file.Text = class_Graph.inputMatrix.rows.ToString();
+            txtBoxTypeMatrix.Text = class_Graph.class_Matrix.typeMatrix;
+            txtBoxNumColumns_file.Text = class_Graph.class_Matrix.columns.ToString();
+            txtBoxNumRows_file.Text = class_Graph.class_Matrix.rows.ToString();
 
-            class_Graph.inputMatrix.get_matrix_view(gridMatrixContent, this);
+            class_Graph.class_Matrix.get_matrix_view(gridMatrixContent, this);
 
             //update_generatedMatrix(false);
             //txtBoxMatrixContent.Text = class_Graph.inputMatrix.matrix_to_string();
@@ -1087,7 +1080,7 @@ namespace GraduateWork_updated
             txtBoxTimeSpent.Text = class_Graph.strTimeAlg;
         }
 
-        /*************** BEGIN filling comboboxs information ***************/
+        /*************** BEGIN filling comboboxes information ***************/
         void fill_cmbBox_typeAlgorithms()
         {
             List<string> typeAlgorithms = new List<string>();
@@ -1131,7 +1124,7 @@ namespace GraduateWork_updated
                 cmbBoxAlgorithms_numberMatching.Items.Clear();
 
             // filling combobox
-            numberAlgorithms.Add(MyResources.lblSingleFlowAlgorithm);
+            numberAlgorithms.Add(MyResources.lblSingleThreadAlgorithm);
 
             if (numberThreads != 0)
                 numberAlgorithms.Add(MyResources.lblMultiThreadAlgorithm);
@@ -1173,7 +1166,7 @@ namespace GraduateWork_updated
 
             cmbBoxAlgorithms_numberThreads.SelectedIndex = 0;
         }
-        /*************** END filling comboboxs information ***************/
+        /*************** END filling comboboxes information ***************/
 
         void inputText_txtBox_sizeMatrix(object sender, TextCompositionEventArgs e)
         {
@@ -1243,23 +1236,23 @@ namespace GraduateWork_updated
                         }
                         else
                             if ((currentValue > minValue) && (currentValue < maxValue))
-                            {
-                                ((TextBox)sender).Text = Convert.ToString(currentValue + 1);
-                                errorMessage = 1;
-                            }
+                        {
+                            ((TextBox)sender).Text = Convert.ToString(currentValue + 1);
+                            errorMessage = 1;
+                        }
                     }
 
                     if (currentValue > maxValue)
                     {
                         ((TextBox)sender).Text = Convert.ToString(maxValue);
-                        errorMessage = 2; 
+                        errorMessage = 2;
                     }
                     else
                         if (currentValue < minValue)
-                        {
-                            ((TextBox)sender).Text = Convert.ToString(minValue);
-                            errorMessage = 3;
-                        }
+                    {
+                        ((TextBox)sender).Text = Convert.ToString(minValue);
+                        errorMessage = 3;
+                    }
 
                     switch (txtBoxName)
                     {
@@ -1324,7 +1317,7 @@ namespace GraduateWork_updated
                         txtBoxNumRows.Text = txtBoxNumColumns.Text;
 
                 }
-                
+
                 if ("keyboard" == typeInput)
                     update_generatedMatrix(true, false);
                 else
@@ -1426,7 +1419,7 @@ namespace GraduateWork_updated
                 Application.Current.Shutdown();
         }
 
-        void btnClose_window_Click(object sender, RoutedEventArgs e)
+        void btnClose_application_Click(object sender, RoutedEventArgs e)
         {
             if (true == btnSaveInFile.IsEnabled)
                 save_result(true);
@@ -1520,7 +1513,7 @@ namespace GraduateWork_updated
 
                 switch (cmbBox.SelectedValue.ToString())
                 {
-                    case MyResources.lblSingleFlowAlgorithm:
+                    case MyResources.lblSingleThreadAlgorithm:
                         cmbBoxAlgorithms_numberThreads.IsEnabled = false;
                         cmbBoxAlgorithms_numberThreads.Items.Clear();
                         break;
@@ -1734,7 +1727,7 @@ namespace GraduateWork_updated
             row = Grid.GetRow((CheckBox)sender) - 1;
             column = Grid.GetColumn((CheckBox)sender) - 1;
 
-            class_Graph.inputMatrix.set_matrix_element(row, column, 1);
+            class_Graph.class_Matrix.set_matrix_element(row, column, 1);
         }
         public void CheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
@@ -1742,23 +1735,15 @@ namespace GraduateWork_updated
             row = Grid.GetRow((CheckBox)sender) - 1;
             column = Grid.GetColumn((CheckBox)sender) - 1;
 
-            class_Graph.inputMatrix.set_matrix_element(row, column, 0);
+            class_Graph.class_Matrix.set_matrix_element(row, column, 0);
         }
 
-        private void btnViewResult_Click(object sender, RoutedEventArgs e)
+        private void btnResultOfRendering_Click(object sender, RoutedEventArgs e)
         {
-            string currPath = Directory.GetCurrentDirectory();
+            WindowRenderingOfResult wnd;
 
-            var window = new Window
-            {
-                Content = new WebBrowser { Source = new Uri(String.Format("file:///{0}/Html/HTMLPage1.html", currPath)) },
-                Width = 700,
-                Height = 400,
-                Title = "Количество паросочетаний"
-            };
-
-            window.Show();
-            this.Show();
+            wnd = new WindowRenderingOfResult(class_Graph.currAlgorithm, class_Graph.currTypeMatrix, class_Graph.numberThreads, class_Graph.columns, class_Graph.maxMatchingPos, class_Graph.ListOfVertices, class_Graph.countMaxMatching, class_Graph.arrVertices, class_Graph.class_Matrix.original_columns);
+            wnd.Show();
         }
 
         private void btnRestore_window_Click(object sender, RoutedEventArgs e)
@@ -1766,14 +1751,14 @@ namespace GraduateWork_updated
             if (WindowState == WindowState.Normal)
             {
                 // Compensate for the extra space WPF adds by increasing the max width and height here
-                this.MaxHeight = SystemParameters.WorkArea.Height + 7;
-                this.MaxWidth = SystemParameters.WorkArea.Width + 7;
+                MaxHeight = SystemParameters.WorkArea.Height + 7;
+                MaxWidth = SystemParameters.WorkArea.Width + 7;
                 grid_mainContainer.Margin = new Thickness(5, 5, 0, 0);
                 WindowState = WindowState.Maximized;
             }
 
             else
-                    if (WindowState == WindowState.Maximized)
+                if (WindowState == WindowState.Maximized)
             {
                 grid_mainContainer.Margin = new Thickness(0);
                 WindowState = WindowState.Normal;
@@ -1782,7 +1767,7 @@ namespace GraduateWork_updated
 
         // change size window application
         #region ResizeWindows
-        
+
         private void Resize_Init(object sender, MouseButtonEventArgs e)
         {
             Rectangle senderRect = sender as Rectangle;
@@ -1881,6 +1866,8 @@ namespace GraduateWork_updated
                 bottomLeftSizeGrip.IsEnabled = true;
             }
         }
+
+
     }
 
 }

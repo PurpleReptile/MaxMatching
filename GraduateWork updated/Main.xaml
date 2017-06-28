@@ -4,11 +4,13 @@
         Title="Подсчёт паросочетаний в графе"
         Width="960"
         Height="670"
+        MinWidth="950"
+        MinHeight="580" 
         AllowsTransparency="True"
         Icon="img/icon_app.png"
-        Loaded="Window_Loaded"
         Style="{StaticResource CustomWindow}"
-        WindowStartupLocation="CenterScreen" 
+        Loaded="Window_Loaded"
+        WindowStartupLocation="CenterScreen"
         StateChanged="mainWindow_StateChanged">
 
     <Window.Background>
@@ -128,7 +130,6 @@
                    MouseLeftButtonDown="top_docPanel_MouseLeftButtonDown">
             <DockPanel.Background>
                 <LinearGradientBrush StartPoint="0, 1" EndPoint="1, 0">
-                    <!--<GradientStop Offset="1" Color="#3583F9" />-->
                     <GradientStop Offset="0.603" Color="#FF034F84" />
                 </LinearGradientBrush>
             </DockPanel.Background>
@@ -190,12 +191,11 @@
                     </MenuItem.Icon>
                 </MenuItem>
 
-                <MenuItem Name="btnClose_window"
-                          Click="btnClose_window_Click"
+                <MenuItem Name="btnClose_application"
+                          Click="btnClose_application_Click"
                           Cursor="Hand"
                           Style="{StaticResource top_menu_tabs}"
-                          ToolTip="Закрыть приложение"
-                          >
+                          ToolTip="Закрыть приложение" >
                     <MenuItem.Icon>
                         <Image Source="img/cross.png" />
                     </MenuItem.Icon>
@@ -205,7 +205,7 @@
         <!--  ****************************************** END top_menu ******************************************  -->
 
         <!--  ****************************************** BGN setting_panel ******************************************  -->
-        <Grid Grid.Row="1">
+        <Grid x:Name="grid_main" Grid.Row="1">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.5*" />
@@ -715,11 +715,11 @@
                          IsReadOnly="True"
                          Style="{StaticResource txtBox_to_label}" />
 
-                <Button Name="btnViewResult"
+                <Button Name="btnResultOfRendering"
                         Grid.Row="8"
                         Grid.Column="0"
                         Margin="5 0"
-                        Click="btnViewResult_Click"
+                        Click="btnResultOfRendering_Click"
                         Content="Визуализировать"
                         IsEnabled="False"
                         Style="{StaticResource styleButton}"

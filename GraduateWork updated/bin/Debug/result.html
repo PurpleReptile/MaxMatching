@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>| Результат</title>
+
+    <style type="text/css">
+        body {
+            margin: 0;
+            padding: 0 2%;
+            font-family: Tahoma;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .center-block {
+            display: flex;
+        }
+
+        td, th {
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            padding: 0.5em 1em;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        .tbl-result tr:hover {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table {
+            border-collapse: collapse;
+        }
+
+        .tbl-result {
+            border: 1px solid #ddd;
+        }
+
+        .tbl-matrix {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            .tbl-matrix td {
+                border: 1px solid #ddd;
+                text-align: center;
+            }
+
+        .bold-td, .bold-tr {
+            font-weight: bold;
+        }
+
+        .centered-table {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .right-panel {
+            flex: 1;
+        }
+
+        .check-cell {
+            color: white;
+            background-color: #007bff;
+        }
+
+        .flex-container {
+            padding: 0;
+            margin: 2em 0;
+            justify-content: space-around;
+            display: flex;
+            -webkit-flex-flow: row wrap;
+        }
+
+        .flex-item {
+            text-align: center;
+            margin: 0.5em;
+            padding: 0 0.5em;
+            border: 0.15em solid black;
+            border-radius: 0.5em;
+        }
+
+        .line-svg {
+            stroke: black;
+            stroke-width: 2;
+        }
+
+        .circle-svg {
+            stroke: #007bff;
+            stroke-width: 2;
+            fill: white;
+        }
+
+        .flex-item-matrix {
+            border: none;
+            padding: 0;
+            margin: 0;
+        }
+        .welcome_li {
+            padding-left: 1em;
+            text-indent: -0.5em;
+            list-style: none;
+            width: 12em;
+        }
+        .welcome_li li {
+            cursor: pointer;
+            padding-bottom: 0.2em;
+        }
+        .welcome_li li:last-child {
+            padding-bottom: 0px;
+        }
+        .welcome_li a {
+            color: #333;
+            text-decoration: none;
+            display: block; 
+            width: 100%; 
+            height: 100%;
+            padding: 0.1em 0;
+        }
+        .welcome_li a:hover {
+            color: #007bff;
+            background-color: #e7e7e7;
+        }
+        .navigartion {
+            color: #007bff;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Результат вычислений</h2>
+
+    <p class="navigartion">Содержание</p>
+    <ul class="welcome_li">
+        <li><a href="#result">| Результат</a></li>
+        <li><a href="#original-matrix">| Матрица смежности</a></li>
+        <li><a href="#reduce-matrix">| Приведённая матрица</a></li>
+        <li><a href="#matching">| Паросочетания</a></li>
+    </ul>
+
+    <h3><a name="result">Результат</a></h3>
+    <table class="table tbl-result">
+        <tr>
+            <th>Параметр</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td>Алгоритм</td>
+            <td>Однопоточный</td>
+        </tr>
+        <tr>
+            <td>Кол-во потоков</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>Оценка сложности</td>
+            <td>O(n!)</td>
+        </tr>
+        <tr>
+            <td>Кол-во операций</td>
+            <td>48</td>
+        </tr>
+        <tr>
+            <td>Временные затраты</td>
+            <td>0,004679 с</td>
+        </tr>
+
+        <tr>
+            <td colspan="2" class="bold-td">Паросочетаний</td>
+        </tr>
+
+        <tr>
+            <td>Максимальных</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>Совершенных</td>
+            <td>2</td>
+        </tr>
+    </table><h3><a name="original-matrix">Исходная матрица</a></h3>
+<div class="flex-container">
+<div class="flex-item flex-item-matrix">
+<table class="table tbl-matrix">
+<tr class="bold-td">
+<td style="font-weight: normal;">-</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+<td>0</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">3</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">4</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">5</td>
+<td class="check-cell">1</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</table>
+</div>
+<div class="flex-item flex-item-matrix">
+<table class="table tbl-result tbl-matrix-origin">
+<tr><th>Параметр</th><th>Значение</th></tr><tr><td>Тип матрицы</td>
+<td>матрица смежности</td>
+</tr><tr><td>Кол-во столбцов</td>
+<td>6</td>
+</tr><tr><td>Кол-во строк</td>
+<td>6</td>
+</tr></table></div></div>
+<h3><a name="reduce-matrix">Приведённая матрица</a></h3>
+<div class="flex-container">
+<div class="flex-item flex-item-matrix">
+<table class="table tbl-matrix">
+<tr class="bold-td">
+<td style="font-weight: normal;">-</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">0</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">1</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+<td>0</td>
+</tr>
+<tr>
+<td style="font-weight: bold;">2</td>
+<td>0</td>
+<td class="check-cell">1</td>
+<td class="check-cell">1</td>
+</tr>
+</table>
+</div>
+<div class="flex-item flex-item-matrix">
+<table class="table tbl-result tbl-matrix-origin">
+<tr><th>Параметр</th><th>Значение</th></tr><tr>
+<td>Тип матрицы</td>
+<td>приведённая матрица смежности</td>
+</tr><tr><td>Кол-во столбцов</td>
+<td>3</td>
+</tr><tr><td>Кол-во строк</td>
+<td>3</td>
+</tr></table></div></div>
+<h3><a name="matching">Паросочетания</a></h3>
+<div class="matching">
+<div class="flex-container">
+<div class="flex-item">
+<p>Паросочетание №1</p>
+<svg width="152" height="180">
+<line x1="21" y1="21" x2="131" y2="81" class="line-svg" />
+<line x1="21" y1="81" x2="131" y2="21" class="line-svg" />
+<line x1="21" y1="141" x2="131" y2="141" class="line-svg" />
+<circle cx="21" cy="21" r="20" class="circle-svg" />
+<text x="17" y="25" fill="black">0</text>
+<circle cx="131" cy="21" r="20" class="circle-svg" />
+<text x="127" y="25" fill="black">3</text>
+<circle cx="21" cy="81" r="20" class="circle-svg" />
+<text x="17" y="85" fill="black">1</text>
+<circle cx="131" cy="81" r="20" class="circle-svg" />
+<text x="127" y="85" fill="black">4</text>
+<circle cx="21" cy="141" r="20" class="circle-svg" />
+<text x="17" y="145" fill="black">2</text>
+<circle cx="131" cy="141" r="20" class="circle-svg" />
+<text x="127" y="145" fill="black">5</text>
+</svg>
+</div>
+<div class="flex-item">
+<p>Паросочетание №2</p>
+<svg width="152" height="180">
+<line x1="21" y1="21" x2="131" y2="141" class="line-svg" />
+<line x1="21" y1="81" x2="131" y2="21" class="line-svg" />
+<line x1="21" y1="141" x2="131" y2="81" class="line-svg" />
+<circle cx="21" cy="21" r="20" class="circle-svg" />
+<text x="17" y="25" fill="black">0</text>
+<circle cx="131" cy="21" r="20" class="circle-svg" />
+<text x="127" y="25" fill="black">3</text>
+<circle cx="21" cy="81" r="20" class="circle-svg" />
+<text x="17" y="85" fill="black">1</text>
+<circle cx="131" cy="81" r="20" class="circle-svg" />
+<text x="127" y="85" fill="black">4</text>
+<circle cx="21" cy="141" r="20" class="circle-svg" />
+<text x="17" y="145" fill="black">2</text>
+<circle cx="131" cy="141" r="20" class="circle-svg" />
+<text x="127" y="145" fill="black">5</text>
+</svg>
+</div>
+</body></html>

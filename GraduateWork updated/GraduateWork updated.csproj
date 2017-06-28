@@ -54,9 +54,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Errors.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="WindowReference.xaml.cs">
       <DependentUpon>WindowReference.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WindowRenderingOfResult.xaml.cs">
+      <DependentUpon>WindowRenderingOfResult.xaml</DependentUpon>
     </Compile>
     <Page Include="Main.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -71,6 +75,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="WindowReference.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WindowRenderingOfResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

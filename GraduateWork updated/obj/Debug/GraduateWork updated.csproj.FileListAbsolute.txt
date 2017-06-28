@@ -15,3 +15,6 @@ W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug
 W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowReference.baml
 W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowReference.g.cs
 W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated_Content.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated_MarkupCompile.lref
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowRenderingOfResult.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowRenderingOfResult.baml

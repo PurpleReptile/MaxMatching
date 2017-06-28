@@ -14,3 +14,6 @@ W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Relea
 W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Release\GraduateWork updated.csproj.GenerateResource.Cache
 W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Release\GraduateWork updated.exe
 W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Release\GraduateWork updated.pdb
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Release\WindowRenderingOfResult.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Release\GraduateWork updated_MarkupCompile.lref
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Release\WindowRenderingOfResult.baml
