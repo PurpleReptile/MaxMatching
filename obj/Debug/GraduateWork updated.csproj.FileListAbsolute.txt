@@ -1,0 +1,20 @@
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\bin\Debug\GraduateWork updated.exe.config
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\bin\Debug\GraduateWork updated.exe
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\bin\Debug\GraduateWork updated.pdb
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated.csprojResolveAssemblyReference.cache
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated_MarkupCompile.cache
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated.g.resources
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork_updated.Properties.Resources.resources
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated.csproj.GenerateResource.Cache
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated.exe
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated.pdb
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\Main.baml
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\Style.baml
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\Main.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\Style.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowReference.baml
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowReference.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated_Content.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\GraduateWork updated_MarkupCompile.lref
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowRenderingOfResult.g.cs
+W:\Work and other\University\GraduateWork updated\GraduateWork updated\obj\Debug\WindowRenderingOfResult.baml
